@@ -9,7 +9,7 @@ I have renamed some column names from the original dataset to make them more cle
 
 -- Let's take a quick look at a few rows in the table
 SELECT
-    TOP 20 *
+    *
 FROM CovidCase cc
 ORDER BY cc.DateRecorded DESC;
 
@@ -22,7 +22,7 @@ SELECT
 	cc.Country
 	, cc.DateRecorded
 	, cc.DailyCases
-	, 'your answer' AS CumulativeCases
+	, SUM(cc.DailyCases) OVER (PARTITION BY cc.Country ORDER BY cc.DateRecorded)  AS CumulativeCases
 FROM
 	CovidCase cc
 where cc.DateRecorded <= '2020-03-15' -- keep # rows returned manageable to avoid scrolling much
@@ -48,7 +48,7 @@ GROUP BY
 SELECT
 	uk.DateRecorded
 	, uk.DailyCases
-	, 'your answer' CumulativeCases
+	, SUM(uk.DailyCases) OVER (ORDER BY uk.DateRecorded) AS CumulativeCases
 FROM
 	uk
 ORDER BY
@@ -68,15 +68,19 @@ SELECT
 	, SUM(cc.DailyCases)
 FROM
 	CovidCase cc
+	
 GROUP BY
 	cc.DateRecorded
     )
 SELECT 
 	uk.DateRecorded
 	, uk.DailyCases
-	, 'your answer' AS Ranking
+	, RANK() OVER (ORDER BY uk.DailyCases DESC) AS Ranking
 FROM
 	uk;
+
+
+	
 
 /*
 Find the three days with the highest number of cases in each country 
@@ -92,6 +96,7 @@ SELECT
 	cc.Country
 	, cc.DateRecorded
 	, cc.DailyCases
+	,  RANK() OVER (PARTITION BY cc.Country ORDER BY cc.DailyCases DESC) AS Ranking
 FROM
 	CovidCase cc
     )
@@ -99,6 +104,8 @@ SELECT
 	*
 FROM
 	cte
+
+	WHERE Ranking < = 3
 
 /*
 Advanced Section

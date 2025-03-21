@@ -5,6 +5,14 @@
  * But not all dates are present
  */
 
+
+DECLARE @StartDate DATE;
+DECLARE @EndDate DATE;
+SELECT @StartDate = DATEFROMPARTS(2024, 1, 1);
+SELECT @EndDate = DATEFROMPARTS(2024, 1, 8);
+DECLARE @NumberOfDays INT = DATEDIFF(DAY, @StartDate, @EndDate) + 1;
+
+
 DROP TABLE IF EXISTS #PatientAdmission;
 CREATE TABLE #PatientAdmission (AdmittedDate DATE, NumAdmissions INT);
 INSERT INTO #PatientAdmission (AdmittedDate, NumAdmissions) VALUES ('2024-01-01', 5)
@@ -12,7 +20,20 @@ INSERT INTO #PatientAdmission (AdmittedDate, NumAdmissions) VALUES ('2024-01-02'
 INSERT INTO #PatientAdmission (AdmittedDate, NumAdmissions) VALUES ('2024-01-03', 4)
 INSERT INTO #PatientAdmission (AdmittedDate, NumAdmissions) VALUES ('2024-01-05', 2)
 INSERT INTO #PatientAdmission (AdmittedDate, NumAdmissions) VALUES ('2024-01-08', 2)
-SELECT * FROM #PatientAdmission
+
+SELECT 
+TALLYDATE.TALLYDates
+,NumAdmissions
+From [#PatientAdmission]
+
+left outer join 
+
+(
+SELECT 
+	DATEADD(DAY, N-1, @StartDate) AS Date = [TALLYDates]
+    
+FROM 
+	Tally) TALLYDATE ON #PatientAdmission.AdmittedDate = TALLYDATE.Date
 
 /*
  * Exercise: create a resultset that has a row for all dates in that period 

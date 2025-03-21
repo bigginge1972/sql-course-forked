@@ -55,7 +55,7 @@ SELECT
 	'A' AS MyColumn
 UNION
 SELECT
-	'B'
+	'A'
 UNION
 SELECT
 	'C';
